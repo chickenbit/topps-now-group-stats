@@ -1,55 +1,39 @@
-import { AgGridReact } from "ag-grid-react"; // React Data Grid Component
-import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the Data Grid
-import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the Data Grid
+import { AgGridReact } from "ag-grid-react";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-balham.css";
 import { useState } from "react";
 import { ColDef } from "ag-grid-community";
 import { CardData } from "./CardData";
 
-// Row Data Interface
-interface IRow {
-  make: string;
-  model: string;
-  price: number;
-  electric: boolean;
+interface CardGridProps {
+  cardData: CardData[];
+  gridRef: React.RefObject<AgGridReact>;
+  agGridProps?: any;
 }
-export function CardGrid({ cardData }: { cardData: CardData[] }) {
-  // Row Data: The data to be displayed.
+
+export function CardGrid({ cardData, gridRef, agGridProps }: CardGridProps) {
   // eslint-disable-next-line
   const [rowData, setRowData] = useState<CardData[]>(cardData);
-  // const [rowData, setRowData] = useState<IRow[]>([
-  //     { make: "Tesla", model: "Model Y", price: 64950, electric: true },
-  //     { make: "Ford", model: "F-Series", price: 33850, electric: false },
-  //     { make: "Toyota", model: "Corolla", price: 29600, electric: false },
-  //     { make: "Mercedes", model: "EQA", price: 48890, electric: true },
-  //     { make: "Fiat", model: "500", price: 15774, electric: false },
-  //     { make: "Nissan", model: "Juke", price: 20675, electric: false },
-  //   ]);
-
-  // Column Definitions: Defines & controls grid columns.
   // eslint-disable-next-line
   const [colDefs, setColDefs] = useState<ColDef<CardData>[]>([
     { field: "number" },
-    { field: "name" },
-    { field: "printRun" },
+    { field: "name", filter: true },
+    { field: "printRun", headerName: "PR" },
     { field: "numberOrdered" },
     { field: "otherHits" },
-    { field: "blueHits" },
-    { field: "purpleHits" },
-    { field: "redHits" },
-    { field: "orangeHits" },
-    { field: "yellowHits" },
+    { field: "blueHits", headerName: "/49" },
+    { field: "purpleHits", headerName: "/25" },
+    { field: "redHits", headerName: "/10" },
+    { field: "orangeHits", headerName: "/5" },
+    { field: "yellowHits", headerName: "/1" },
   ]);
-  // const [colDefs, setColDefs] = useState<ColDef<IRow>[]>([
-  //   { field: "make" },
-  //   { field: "model" },
-  //   { field: "price" },
-  //   { field: "electric" },
-  // ]);
   const defaultColDef: ColDef = {
     flex: 1,
+    sortable: true,
+    filter: true,
+    resizable: true,
   };
 
-  // Container: Defines the grid's theme & dimensions.
   return (
     <div
       id="myGrid"
@@ -58,9 +42,11 @@ export function CardGrid({ cardData }: { cardData: CardData[] }) {
       // style={{width:500, height: 500}}
     >
       <AgGridReact
+        ref={gridRef}
         rowData={rowData}
         columnDefs={colDefs}
         defaultColDef={defaultColDef}
+        {...agGridProps}
       />
     </div>
   );

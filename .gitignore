@@ -3,6 +3,7 @@
 .parcel-cache
 .vscode
 .local
+
 # dependencies
 /node_modules
 /.pnp

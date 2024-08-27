@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Button,
   Col,
@@ -9,9 +9,11 @@ import {
   Typography,
 } from "antd";
 import { CardGrid } from "./CardGrid";
-import { cardData } from "./rawData";
+import { cardData as staticCardData } from "./rawData";
 import { CardData } from "./CardData";
-import { CardFunnel, data } from "./CardFunnel";
+import { CardFunnel, ColoredFunnelDatum } from "./CardFunnel";
+import { FunnelDatum } from "@nivo/funnel";
+import { AgGridReact } from "ag-grid-react";
 
 const { Header, Footer, Sider, Content } = Layout;
 const { Title, Paragraph, Text, Link } = Typography;
@@ -34,7 +36,7 @@ const contentStyle: React.CSSProperties = {
 };
 const gridStyle: React.CSSProperties = {
   textAlign: "center",
-  minHeight: 100,
+  minHeight: 300,
   color: "#fff",
   backgroundColor: "#0958d9",
 };
@@ -42,8 +44,8 @@ const chartStyle: React.CSSProperties = {
   textAlign: "center",
   height: 500,
   // lineHeight: "120px",
-  color: "#fff",
-  backgroundColor: "#0958d9",
+  // color: "#fff",
+  // backgroundColor: "#0958d9",
 };
 
 const siderStyle: React.CSSProperties = {
@@ -65,53 +67,97 @@ const layoutStyle = {
   maxWidth: "calc(100% - 8px)",
 };
 
-async function loadCardDataFromJson(url: string): Promise<CardData[]> {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const data: CardData[] = await response.json();
-    return data;
-  } catch (error) {
-    console.error(`Error fetching or parsing JSON: ${error}`);
-    return [];
-  }
-}
-// const cardData: CardData[] = loadCardDataFromJson(filePath);
-// const App: React.FC = () => (
 function App() {
-  // const [cardData, setCardData] = useState<CardData[]>([]); // State to store card data
-  // useEffect(() => {
-  //   const filePath = "./cards.json"; // Replace with your file path or URL
-  //   async function fetchData() {
-  //     const data = await loadCardDataFromJson(filePath);
-  //     setCardData(data); // Update the state with the fetched data
-  //   }
+  const [cardData, setCardData] = useState<CardData[]>(staticCardData); // State to store card data
+  const gridRef = useRef<AgGridReact>(null); // Ref for the grid instance
+  const [printRun, setPrintRun] = useState(0);
+  const [cardRows, setCardRows] = useState(staticCardData.length);
+  const [funnelData, setFunnelData] = useState<ColoredFunnelDatum[]>([
+    { id: "ordered", value: 0, label: "Ordered", color: "green" },
+    { id: "yellow", value: 0, label: "/1", color: "yellow" },
+    { id: "orange", value: 0, label: "/5", color: "orange" },
+    { id: "red", value: 0, label: "/10", color: "red" },
+    { id: "purple", value: 0, label: "/25", color: "purple" },
+    { id: "blue", value: 0, label: "/49", color: "blue" },
+    // { id: "other", value: 0, label: "/x" },
+  ]);
 
-  //   fetchData(); // Call the async function to load data
-  // }, []); // Empty dependency array ensures this runs only once
+  const updateFunnelData = (data: CardData[]) => {
+    let printRun = 0;
+    let ordered = 0;
+    let yellow = 0;
+    let orange = 0;
+    let red = 0;
+    let purple = 0;
+    let blue = 0;
+    let other = 0;
+    data.forEach((card) => {
+      printRun += card.printRun;
+      ordered += card.numberOrdered;
+      yellow += card.yellowHits;
+      orange += card.orangeHits;
+      red += card.redHits;
+      purple += card.purpleHits;
+      blue += card.blueHits;
+      other += card.otherHits;
+    });
+    setPrintRun(printRun);
+    setFunnelData([
+      { id: "ordered", value: ordered, label: "Ordered", color: "green" },
+      // { id: "other", value: other, label: "/x" },
+      { id: "blue", value: blue, label: "/49", color: "blue" },
+      { id: "purple", value: purple, label: "/25", color: "purple" },
+      { id: "red", value: red, label: "/10", color: "red" },
+      { id: "orange", value: orange, label: "/5", color: "orange" },
+      { id: "yellow", value: yellow, label: "/1", color: "yellow" },
+    ]);
+  };
+
+  useEffect(() => {
+    updateFunnelData(cardData);
+  }, [cardData]);
+
+  const onFilterChanged = () => {
+    if (gridRef.current) {
+      // Get filtered row data from the grid API
+      // const filteredData = gridRef.current.api.getDisplayedRowAtIndex(0)?.data;
+      const allFilteredData = [];
+      setCardRows(gridRef.current.api.getDisplayedRowCount());
+      for (let i = 0; i < gridRef.current.api.getDisplayedRowCount(); i++) {
+        const node = gridRef.current.api.getDisplayedRowAtIndex(i);
+        if (node && node.data) {
+          allFilteredData.push(node.data);
+        }
+      }
+      updateFunnelData(allFilteredData); // Update chart data with filtered rows
+    }
+  };
+
   return (
     <>
       <div className="App">
         <Flex gap="middle" wrap>
           <Layout style={layoutStyle}>
             <Header style={headerStyle}>Welcome to ToppsNOW!</Header>
+            <Paragraph>
+              <Text>
+                Total Print Run of {printRun} cards over {cardRows} cards is
+                average of {Math.floor(printRun / cardRows)}printed per card.
+              </Text>
+            </Paragraph>
             <Content style={gridStyle}>
-              <CardGrid cardData={cardData} />
+              <CardGrid
+                cardData={cardData}
+                gridRef={gridRef}
+                agGridProps={{ onFilterChanged: onFilterChanged }}
+              />
             </Content>
             <Content style={chartStyle}>
-              <CardFunnel data={data} />
+              <CardFunnel data={funnelData} />
             </Content>
             <Footer style={footerStyle}>Footer</Footer>
           </Layout>
         </Flex>
-        {/* <Row>
-          <Col flex="auto">
-            <div style={{ height: 500, width: 800 }}></div>
-            <CardGrid />
-          </Col>
-        </Row> */}
       </div>
     </>
   );
