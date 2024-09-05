@@ -1,18 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Button,
-  Col,
-  ConfigProvider,
-  Flex,
-  Layout,
-  Row,
-  Typography,
-} from "antd";
+import { Flex, Layout, Typography } from "antd";
 import { CardGrid } from "./CardGrid";
 import { cardData as staticCardData } from "./rawData";
 import { CardData } from "./CardData";
 import { CardFunnel, ColoredFunnelDatum } from "./CardFunnel";
-import { FunnelDatum } from "@nivo/funnel";
 import { AgGridReact } from "ag-grid-react";
 
 const { Header, Footer, Sider, Content } = Layout;
