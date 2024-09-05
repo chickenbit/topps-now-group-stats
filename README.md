@@ -1,5 +1,2 @@
-# ToppsNOW Visualization Demo
-
-Demo to visualize card data or ToppsNOW purchases, print runs and hits.
-
-
+# topps-now-group-stats
+Interactive website to review ToppsNOW group buy stats and pulls.
