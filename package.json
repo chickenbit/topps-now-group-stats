@@ -24,7 +24,8 @@
   "source": "./public/index.html",
   "scripts": {
     "start": "parcel",
-    "build": "parcel build",
+    "build:dist": "parcel build",
+    "build": "parcel build --dist-dir build",
     "lint": ""
   },
   "eslintConfig": {
