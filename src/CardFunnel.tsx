@@ -1,3 +1,4 @@
+import React from "react";
 import { FunnelDatum, ResponsiveFunnel } from "@nivo/funnel";
 
 export interface ColoredFunnelDatum extends FunnelDatum {

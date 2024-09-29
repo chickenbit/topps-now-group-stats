@@ -1,3 +1,4 @@
+import React from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-balham.css";
@@ -8,7 +9,7 @@ import { CardData } from "./CardData";
 interface CardGridProps {
   cardData: CardData[];
   gridRef: React.RefObject<AgGridReact>;
-  agGridProps?: any;
+  agGridProps?: unknown;
 }
 
 export function CardGrid({ cardData, gridRef, agGridProps }: CardGridProps) {
@@ -46,7 +47,7 @@ export function CardGrid({ cardData, gridRef, agGridProps }: CardGridProps) {
         rowData={rowData}
         columnDefs={colDefs}
         defaultColDef={defaultColDef}
-        {...agGridProps}
+        {...(agGridProps as object)}
       />
     </div>
   );

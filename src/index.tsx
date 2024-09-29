@@ -1,8 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import App from "./App";
 import { ConfigProvider, theme } from "antd";
+import { HashRouter as Router } from "react-router-dom";
+import App from "./App";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -14,7 +15,9 @@ root.render(
         algorithm: [theme.defaultAlgorithm, theme.compactAlgorithm],
       }}
     >
-      <App />
+      <Router>
+        <App />
+      </Router>
     </ConfigProvider>
   </React.StrictMode>
 );

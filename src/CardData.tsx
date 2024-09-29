@@ -1,7 +1,7 @@
 import * as fs from "fs";
 
 export interface CardData {
-  number: number;
+  number: string | number;
   name: string;
   printRun: number;
   numberOrdered: number;
